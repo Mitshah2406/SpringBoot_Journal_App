@@ -9,6 +9,7 @@ import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -23,6 +24,8 @@ public class JournalEntryController {
     public JournalEntryService journalEntryService;
     @Autowired
     public UserService userService;
+
+
     @PostMapping("create/{username}")
     public ResponseEntity<?> createEntry(@PathVariable String username, @RequestBody JournalEntry je){
        try{
@@ -31,8 +34,7 @@ public class JournalEntryController {
 
            User u = userService.getUserByUsername(username);
            if(u!=null){
-               JournalEntry newJE = journalEntryService.saveEntry(je);
-               userService.addJournalEntryToRespectiveUser(username, newJE);
+              JournalEntry newJE =  userService.addJournalEntryToRespectiveUser(username, je);
                return new ResponseEntity<>(newJE, HttpStatus.CREATED);
            }else{
                return new ResponseEntity<>("User not present", HttpStatus.NOT_FOUND);
